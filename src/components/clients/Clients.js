@@ -8,15 +8,14 @@ const Clients = () => {
     // use effect es similar a componentdidmount y willmount
     const consultaAPI = async () => {
         const clients = await clienteAxios.get('/clients')
-        console.log(clients)
+        // console.log(clients)
         // colocar el result en el state
         setClients(clients.data)
     }
 
     useEffect(() => {
         consultaAPI();
-        
-    }, [])
+    }, [clients]);
 
     return (
         <Fragment>
