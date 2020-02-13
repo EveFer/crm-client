@@ -17,16 +17,18 @@ const Client = ({client}) => {
             cancelButtonColor: '#d33',
             confirmButtonText: 'Si, Eliminar!',
             cancelButtonText: 'Cancelar'
-          }).then((result) => {
+          }).then(async (result) => {
             if (result.value) {
                 // llamado a axios
-                clientAxios.delete(`/clients/${idClient}`)
+                await clientAxios.delete(`/clients/${idClient}`)
                     .then(res => {
-                        Swal.fire(
-                            'Eliminado!',
-                            res.data.message,
-                            'success'
-                        )
+                        if(res.status === 2000){
+                            Swal.fire(
+                                'Eliminado!',
+                                res.data.message,
+                                'success'
+                            )
+                        }
                     })
               
             }

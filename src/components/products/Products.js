@@ -1,8 +1,41 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom'
-
+import axios from 'axios'
+import clienteAxios from '../../config/axios.js'
+import Product from './Product'
+import Spinner from '../layout/Spinner'
 
 const Products = () => {
+    const [products, setProducts] = useState([])
+    
+    // useeffect para consultar la pai para cuando cargue
+    useEffect(()=> {
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source()
+        // request a la api
+        const consultaAPI = async () => {
+            try {
+                const producsConsult = await clienteAxios.get('/products', {cancelToken: source.token})
+                setProducts(producsConsult.data)
+            } catch (error) {
+                if (axios.isCancel(error)) {
+                    console.log("cancelled");
+                } else {
+                throw error;
+                }
+            }
+        };
+        consultaAPI();
+        return () => {
+         source.cancel();
+        };
+    }, [products]);
+    /* colocamos products en entre los corchetes del useEffect pa realizar la recarga del componente 
+    para cuando se actualizen los products( elimino)c*/
+
+    // spinner de carga
+    if(!products.length) return (<Spinner />)
+
     return (
         <>
             <h2>Productos</h2>
@@ -11,24 +44,12 @@ const Products = () => {
             </Link>
 
             <ul className="listado-productos">
-                <li className="producto">
-                    <div className="info-producto">
-                        <p className="nombre">VueJS</p>
-                        <p className="precio">$25.00 </p>
-                        <img src="img/1.jpg" alt="imagen" />
-                    </div>
-                    <div className="acciones">
-                        <a href="#" className="btn btn-azul">
-                            <i className="fas fa-pen-alt"></i>
-                            Editar Producto
-                        </a>
-
-                        <button type="button" className="btn btn-rojo btn-eliminar">
-                            <i className="fas fa-times"></i>
-                            Eliminar Cliente
-                        </button>
-                    </div>
-                </li>
+                {products.map(product => (
+                    <Product 
+                        key={product._id}
+                        product={product}
+                    />
+                ))}
             </ul>
 
         </>
